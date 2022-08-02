@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS message_table (
     username VARCHAR(100) NOT NULL,
     message VARCHAR(100),
     PRIMARY KEY(id, username),
-    FOREIGN KEY (username) REFERENCES user_table(username) ON DELETE CASCADE 
+    FOREIGN KEY (username) REFERENCES user_table(username) ON DELETE CASCADE
 );
