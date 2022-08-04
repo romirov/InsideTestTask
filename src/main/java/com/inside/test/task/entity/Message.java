@@ -1,12 +1,14 @@
 package com.inside.test.task.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @AllArgsConstructor
+@Data
 public class Message implements MessageInterface {
-  public final long id;
-  public final String username;
-  public final String message;
+  private final long id;
+  private final String username;
+  private final String message;
 
   @Override
   public String getUsername() {

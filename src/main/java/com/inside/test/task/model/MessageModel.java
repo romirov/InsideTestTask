@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class MessageModel implements MessageInterface {
-  public final String username;
-  public final String message;
+  private final String username;
+  private final String message;
 
   @Override
   public String getUsername() {

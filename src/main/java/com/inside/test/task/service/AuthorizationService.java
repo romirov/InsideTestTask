@@ -25,19 +25,24 @@ public class AuthorizationService {
     log.info("Generate token...");
     log.info("Secret :  " + secret);
     Date date = Date.valueOf(LocalDate.now().plusDays(1));
-    String username = user.getUsername();
     Key key = getKeyFromSecret();
-    return Jwts.builder().setSubject(username).setExpiration(date).signWith(key).compact();
+    return Jwts.builder()
+        .claim("name: ", user.getUsername())
+        .setExpiration(date)
+        .signWith(key)
+        .compact();
   }
 
   private Key getKeyFromSecret() {
     return Keys.hmacShaKeyFor(secret.getBytes());
   }
 
-  public boolean checkTokenValidity(final String token) {
+  public boolean isTokenValid(final String username, final String token) {
     try {
-      getClaimsFromToken(token);
-      return true;
+      final Claims claims = getClaimsFromToken(token);
+      final String usernameFromToken = claims.getSubject();
+
+      return (username.equals(usernameFromToken))? true : false;
     } catch (ExpiredJwtException expEx) {
       log.error("Token expired");
     } catch (UnsupportedJwtException unsEx) {
@@ -45,18 +50,12 @@ public class AuthorizationService {
     } catch (MalformedJwtException mjEx) {
       log.error("Malformed jwt");
     } catch (Exception e) {
-      log.error("invalid token");
+      log.error("Invalid token");
     }
     return false;
   }
 
   private Claims getClaimsFromToken(final String token) {
-    return (Claims) Jwts.parserBuilder().setSigningKey(getKeyFromSecret()).build().parseClaimsJws(token);
-  }
-
-  public boolean isTokenContainedUsername(UserInterface user, String token) {
-    final Claims claims = getClaimsFromToken(token);
-    String username = claims.getSubject();
-    return (username.equals(user.getUsername()))? true : false;
+    return Jwts.parserBuilder().setSigningKey(getKeyFromSecret()).build().parseClaimsJws(token).getBody();
   }
 }

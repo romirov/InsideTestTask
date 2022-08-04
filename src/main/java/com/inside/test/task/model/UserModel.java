@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class UserModel implements UserInterface {
-  public final String username;
-  public final String password;
+  private final String username;
+  private final String password;
 
   @Override
   public String getUsername() {
