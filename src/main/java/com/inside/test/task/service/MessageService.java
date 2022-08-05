@@ -28,19 +28,18 @@ public class MessageService implements MessageDaoInterface {
 
   @Override
   @Transactional
-  public boolean update(MessageInterface message) {
+  public boolean update(final Message message) {
     final String queryUpdate =
-        "UPDATE message_table SET username=?, message=? WHERE username=?";
+        "UPDATE message_table SET message=? WHERE id=?";
     return jdbcTemplate.update(queryUpdate
-        ,message.getUsername()
         ,message.getMessage()
-        ,message.getUsername()) > 0;
+        ,message.getId()) > 0;
   }
 
   @Override
   @Transactional
   public boolean delete(MessageInterface message) {
-    final String queryDelete = "DELETE FROM message_table WHERE username=" + message.getUsername();
+    final String queryDelete = "DELETE FROM message_table WHERE username='" + message.getUsername() + "'";
     return jdbcTemplate.update(queryDelete) > 0;
   }
 

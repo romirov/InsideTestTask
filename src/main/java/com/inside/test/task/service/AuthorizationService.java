@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.Map.Entry;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -24,8 +26,8 @@ public class AuthorizationService {
   public String generateToken(UserInterface user) {
     log.info("Generate token...");
     log.info("Secret :  " + secret);
-    Date date = Date.valueOf(LocalDate.now().plusDays(1));
-    Key key = getKeyFromSecret();
+    final Date date = Date.valueOf(LocalDate.now().plusDays(1));
+    final Key key = getKeyFromSecret();
     return Jwts.builder()
         .claim("name: ", user.getUsername())
         .setExpiration(date)
@@ -39,8 +41,11 @@ public class AuthorizationService {
 
   public boolean isTokenValid(final String username, final String token) {
     try {
-      final Claims claims = getClaimsFromToken(token);
-      final String usernameFromToken = claims.getSubject();
+      final Set<Entry<String, Object>> claims = getClaimsFromToken(token).entrySet();
+      final String usernameFromToken = claims.stream()
+          .map(it -> it.getValue())
+          .findFirst()
+          .get().toString();
 
       return (username.equals(usernameFromToken))? true : false;
     } catch (ExpiredJwtException expEx) {
@@ -56,6 +61,10 @@ public class AuthorizationService {
   }
 
   private Claims getClaimsFromToken(final String token) {
-    return Jwts.parserBuilder().setSigningKey(getKeyFromSecret()).build().parseClaimsJws(token).getBody();
+    return Jwts.parserBuilder()
+        .setSigningKey(getKeyFromSecret())
+        .build()
+        .parseClaimsJws(token)
+        .getBody();
   }
 }

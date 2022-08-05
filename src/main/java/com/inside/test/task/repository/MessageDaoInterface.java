@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface MessageDaoInterface {
   public boolean save(final MessageInterface message);
-  public boolean update(final MessageInterface message);
+  public boolean update(final Message message);
   public boolean delete(final MessageInterface message);
   public List<Message> findByUsernameAndAmount(final String username, final String amountMessages);
 }

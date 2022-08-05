@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,6 +34,7 @@ public class TestTaskController {
   @PostMapping("/user")
   @ResponseBody
   public ResponseEntity<?> addUser(@RequestBody UserModel user) {
+
     log.info("Adding a user " + user.getUsername());
 
     if(userDaoImpl.find(user) != null) {
@@ -44,7 +44,7 @@ public class TestTaskController {
 
     if (userDaoImpl.save(user)) {
       log.info("User " + user.getUsername() + " added");
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>("User added", HttpStatus.OK);
     }
 
     log.error("User " + user.getUsername() + " not added");
@@ -54,14 +54,17 @@ public class TestTaskController {
   @PostMapping("/login")
   @ResponseBody
   public ResponseEntity<?> authorization(@RequestBody UserModel user) {
+
     log.info("The user " + user.getUsername() +" logs in ");
     final UserInterface userFromDB = userDaoImpl.find(user);
 
     if(userFromDB != null
         && userFromDB.getUsername().equals(user.getUsername())
         && userFromDB.getPassword().equals(user.getPassword())) {
+
       log.info("The user " + user.getUsername() + " is authorized ");
       final Token token = new Token(authService.generateToken(user));
+
       log.info("The user's token is: " + token.getToken());
       return new ResponseEntity<Token>(token, HttpStatus.OK);
     }
@@ -74,14 +77,16 @@ public class TestTaskController {
   @ResponseBody
   public ResponseEntity<?> addMessage(@RequestBody MessageModel message
       ,@RequestHeader(name="Authorization", required=true) String authHeader) {
+
     log.info("User " + message.getUsername() + " adds a message: " + message.getMessage());
 
-    if(isHistoryMessage(message.getMessage())) {
-      ResponseEntity<?> response = processingOfHistoricalMessages(message, authHeader);
-      return response;
-    }
-
     if(isAuthHeaderValid(message.getUsername(), authHeader)) {
+      if(isHistoryMessage(message.getMessage())) {
+
+        ResponseEntity<?> response = processingOfHistoricalMessages(message, authHeader);
+        return response;
+      }
+
       if(messageDaoImpl.save(message)) {
         log.info("Message saved");
         return new ResponseEntity<>("Message saved",HttpStatus.OK);
@@ -99,35 +104,31 @@ public class TestTaskController {
   }
 
   private boolean isAuthHeaderValid(final String username, final String authHeader) {
+
     final String tokenFromRequest = authHeader.substring("Bearer ".length(), authHeader.length());
-    log.info("User`s token: " + authHeader);
+    log.info("User`s token from message: " + tokenFromRequest);
 
-    if (authService.isTokenValid(username,tokenFromRequest)) {
-      return true;
-    }
-
-    return false;
+    return (authService.isTokenValid(username,tokenFromRequest)) ? true : false;
   }
 
   @ResponseBody
   public ResponseEntity<?> processingOfHistoricalMessages(@RequestBody MessageModel message
       ,@RequestHeader(name = "Authorization", required=true) String authHeader) {
+
     log.info("User " + message.getUsername() + " adds a message: " + message.getMessage());
+    final String amountMessages = message.getMessage().substring("history ".length(), message.getMessage().length());
+    final List<Message> listMessages =
+        messageDaoImpl.findByUsernameAndAmount(message.getUsername(), amountMessages);
 
-    if(isAuthHeaderValid(message.getUsername(), authHeader)) {
-      final String amountMessages = message.getMessage().substring("history ".length(), message.getMessage().length());
-      final List<Message> listMessages =
-          messageDaoImpl.findByUsernameAndAmount(message.getUsername(), amountMessages);
-      messageDaoImpl.save(message);
-
-
-      final Stream<MessageModel> stream = listMessages.stream().map(it ->
-          new MessageModel(it.getUsername(), it.getMessage()));
-      final List<MessageModel> listMessageModel = stream.collect(Collectors.toList());
-
-      return new ResponseEntity<>(listMessageModel, HttpStatus.OK);
+    messageDaoImpl.save(message);
+    if(listMessages.isEmpty()) {
+      return new ResponseEntity<>("Messages not found", HttpStatus.NOT_FOUND);
     }
-    
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    final Stream<MessageModel> stream = listMessages.stream().map(it ->
+        new MessageModel(it.getUsername(), it.getMessage()));
+    final List<MessageModel> listMessageModel = stream.collect(Collectors.toList());
+
+    return new ResponseEntity<>(listMessageModel, HttpStatus.OK);
   }
 }

@@ -5,6 +5,10 @@ Description
 ---------
 The project creates a rest api for creating a user, authorizing him, adding messages to the database and getting the latest messages from the database.
 
+ATTENTION!!!
+------------
+Before launching the project or building it with tests, you must start the container with the base, as described below.
+
 Pre-Installation steps
 ----------------------
 1. Check if docker and docker-compose are installed in the operating system.
@@ -52,7 +56,7 @@ docker pull postgres
 ```
 3. Run it with the command
 ```
-sudo docker run -it --rm -e POSTGRES_PASSWORD=postgres --name postgres -p 5432:5432 postgres -d postgres
+docker run -it --rm -e POSTGRES_PASSWORD=postgres --name postgres -p 5432:5432 postgres -d postgres
 ```
 4. Сlone project from GitHub
 ```
@@ -115,9 +119,9 @@ curl -X 'POST' \
   "password": "adm"
 }'
 ```
-- saving a message
+- adding a message
 ```
-curl -X 'POST' \
+curl -X 'GET' \
   'http://localhost:7777/message' \
   -H 'accept: */*' \
   -H 'Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJuYW1lOiAiOiIxMTEiLCJleHAiOjE2NTk2NDY4MDB9._AoN_eqbASxerBei67zg9nk3cJJvgUQqosAbnZf32J5q9dkKCLHPRDkJv1vZtIx0' \
@@ -129,7 +133,7 @@ curl -X 'POST' \
 ```
 - receiving historical messages
 ```
-curl -X 'POST' \
+curl -X 'GET' \
   'http://localhost:7777/message' \
   -H 'accept: */*' \
   -H 'Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJuYW1lOiAiOiIxMTEiLCJleHAiOjE2NTk2NDY4MDB9._AoN_eqbASxerBei67zg9nk3cJJvgUQqosAbnZf32J5q9dkKCLHPRDkJv1vZtIx0' \

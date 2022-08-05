@@ -39,10 +39,10 @@ public class UserService implements UserDaoInterface {
         ,user.getUsername()) > 0;
   }
 
-  @Transactional
   @Override
+  @Transactional
   public boolean delete(final UserInterface user) {
-    final String queryDelete = "DELETE FROM user_table WHERE username=" + user.getUsername();
+    final String queryDelete = "DELETE FROM user_table WHERE username='" + user.getUsername() + "'";
     return jdbcTemplate.update(queryDelete) > 0;
   }
 
