@@ -54,7 +54,7 @@ If you want to build and install the application from the beginning
 ```
 docker pull postgres
 ```
-3. Run it with the command
+3. Run it with the command(command only for testing)
 ```
 docker run -it --rm -e POSTGRES_PASSWORD=postgres --name postgres -p 5432:5432 postgres -d postgres
 ```
@@ -80,10 +80,17 @@ java -jar target/TestTask.jar
 4. Go to the Usage section and use the commands described there
 
 #### Optional:
-The application can also be packaged in a docker container by running the command in the project directory
+The application can also be packaged in a docker container by running the command in the project directory( PostgreSQL image must be running at this time )
 ```
-docker build .
+mvn spring-boot:build-image
 ```
+The image with the application will be called inside_test_task
+
+It can be viewed with the command
+```
+docker images 
+```
+docker.io/library/inside_test_task:latest
 Then stop the PostgeSQL container if it is running
 ```
 docker down 
@@ -92,6 +99,10 @@ And run both containers at the same time by executing the command in the applica
 ```
 docker-compose 
 ```
+
+docker tag local-image:tagname new-repo:tagname
+docker push new-repo:tagname
+docker push marukhan/inside_test_task:tagname
 
 
 Usage
@@ -121,7 +132,7 @@ curl -X 'POST' \
 ```
 - adding a message
 ```
-curl -X 'GET' \
+curl -X 'POST' \
   'http://localhost:7777/message' \
   -H 'accept: */*' \
   -H 'Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJuYW1lOiAiOiIxMTEiLCJleHAiOjE2NTk2NDY4MDB9._AoN_eqbASxerBei67zg9nk3cJJvgUQqosAbnZf32J5q9dkKCLHPRDkJv1vZtIx0' \

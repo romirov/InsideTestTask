@@ -14,8 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
@@ -73,9 +76,9 @@ public class TestTaskController {
     return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
   }
 
-  @GetMapping("/message")
+  @RequestMapping(value="/message", method = {RequestMethod.POST, RequestMethod.GET})
   @ResponseBody
-  public ResponseEntity<?> addMessage(@RequestBody MessageModel message
+  public ResponseEntity<?> processingOfMessages(@RequestBody MessageModel message
       ,@RequestHeader(name="Authorization", required=true) String authHeader) {
 
     log.info("User " + message.getUsername() + " adds a message: " + message.getMessage());
