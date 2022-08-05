@@ -27,11 +27,11 @@ If you want to install the app and use it right away
 * Open console and run the commands below
 * Сlone project from GitHub
 ```
-git clone 
+git clone git@github.com:romirov/InsideTestTask.git
 ``` 
 * Go to the project folder
 ```
-cd 
+cd InsideTestTask
 ```
 * Downloading PostgreSQL docker image from Docker Hub
 ```
@@ -39,11 +39,11 @@ docker pull postgres
 ```
 * Downloading TestTask docker image from Docker Hub
 ```
-docker pull TestTask
+docker pull marukhan/inside_test_task
 ```
 * Run the images by running the command
 ```
-docker-compose run -d
+docker-compose up
 ```
 * Go to the Usage section and use the commands described there
 
@@ -60,50 +60,68 @@ docker run -it --rm -e POSTGRES_PASSWORD=postgres --name postgres -p 5432:5432 p
 ```
 4. Сlone project from GitHub
 ```
-git clone 
+git clone git@github.com:romirov/InsideTestTask.git
 ``` 
 If the application is not planned to be launched in the console,
 then it can be opened and built in the IDE, using the tools it offers.
 To run an application in console:
 1. Go to the project folder
 ```
-cd 
+cd InsideTestTask
 ```
-2. Putting together a project
+2. In the application.properties file, comment out the line 
 ```
-mvn clean install -U -DskipTests
+spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
 ```
-3. Launching the application
+and uncomment
 ```
-java -jar target/TestTask.jar
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
 ```
-4. Go to the Usage section and use the commands described there
+spring.datasource.url=jdbc:postgresql://postgres:5432/postgres - is need for work in docker image
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres - is need for connect to posgresql from IDE and progeny tests in IDE
+3. Putting together a project
+```
+mvn clean install -U 
+```
+4. Launching the application
+```
+java -jar target/TestTask-0.0.1-SNAPSHOT.jar
+```
+5. Go to the Usage section and use the commands described there
 
 #### Optional:
+
+####!!!Don't forget to change the line in application.properties.
 The application can also be packaged in a docker container by running the command in the project directory( PostgreSQL image must be running at this time )
 ```
-mvn spring-boot:build-image
+mvn spring-boot:build-image -DskipTests
 ```
-The image with the application will be called inside_test_task
+The image with the application will be called marukhan/inside_test_task
 
 It can be viewed with the command
 ```
 docker images 
 ```
-docker.io/library/inside_test_task:latest
 Then stop the PostgeSQL container if it is running
 ```
-docker down 
+docker stop IMAGE_ID 
 ```
 And run both containers at the same time by executing the command in the application directory
 ```
-docker-compose 
+docker-compose up
 ```
-
+To upload the application image to your repository on Docker Hub, do the following:
+```
+docker images
+docker tag IMAGE_ID accaunt_name_from_docker_hub/image_name:latest
+docker login
+docker push accaunt_name_from_docker_hub/image_name:latest
+```
+In other words
+```
 docker tag local-image:tagname new-repo:tagname
 docker push new-repo:tagname
-docker push marukhan/inside_test_task:tagname
-
+```
 
 Usage
 -----
