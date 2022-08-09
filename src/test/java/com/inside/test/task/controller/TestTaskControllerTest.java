@@ -7,7 +7,6 @@ import com.inside.test.task.service.AuthorizationService;
 import com.inside.test.task.service.UserService;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
